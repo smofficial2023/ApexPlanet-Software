@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Tech Blog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 1.8em;
+            margin: 25px 0 15px 0;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: #e74c3c;
+        }
+
+        h3 {
+            color: #2980b9;
+            font-size: 1.3em;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            text-align: justify;
+            color: #555;
+        }
+
+        .hero_sect {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .hero_sect h1 {
+            color: white;
+            margin-bottom: 20px;
+            -webkit-text-fill-color: white;
+        }
+
+        .content_grd {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .main-content {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .sidebar {
+            background: #ecf0f1;
+            padding: 25px;
+            border-radius: 10px;
+            height: fit-content;
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .image-container img:hover {
+            transform: scale(1.05);
+        }
+
+        .image-caption {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: #e74c3c;
+            text-decoration: underline;
+        }
+
+        .link-list {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+        }
+
+        .link-list h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .link-list ul {
+            list-style: none;
+        }
+
+        .link-list li {
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .link-list li:last-child {
+            border-bottom: none;
+        }
+
+        .alert-button {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .alert-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(231, 76, 60, 0.4);
+            background: linear-gradient(45deg, #c0392b, #a93226);
+        }
+
+        .alert-button:active {
+            transform: translateY(0);
+        }
+
+        .tech-card {
+            background: white;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .tech-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero_sect">
+            <h1>🚀 Modern Technology Hub</h1>
+            <p>Exploring the latest innovations in web development, AI, and digital transformation</p>
+        </div>
+
+        <div class="content_grd">
+            <div class="main-content">
+                <h2>Welcome to the Future of Technology</h2>
+                <p>Technology is evolving at an unprecedented pace, reshaping how we work, communicate, and live. From artificial intelligence revolutionizing industries to quantum computing promising to solve complex problems, we're witnessing a <span class="highlight">digital renaissance</span> that's transforming every aspect of our lives.</p>
+
+                <div class="image-container">
+                    <img src="https://media.istockphoto.com/id/2114295998/photo/asian-and-indian-developer-devops-team-discussion-about-coding-promgram-with-software.jpg?s=612x612&w=0&k=20&c=LKwTqUnNPgasiwnhKSHfnwxZMxQdD5ziIZRrhGSOlu0=" alt="Modern technology workspace">
+                    <div class="image-caption">A modern tech workspace showcasing innovation and creativity</div>
+                </div>
+
+                <h3>🔥 Trending Technologies</h3>
+                <p>The technology landscape is constantly shifting, with new innovations emerging daily. Machine learning algorithms are becoming more sophisticated, enabling applications that seemed impossible just a few years ago. Cloud computing continues to democratize access to powerful resources, while edge computing brings processing closer to where data is generated.</p>
+
+                <div class="tech-card">
+                    <h3>🤖 Artificial Intelligence</h3>
+                    <p>AI is transforming industries from healthcare to finance, enabling predictive analytics, automated decision-making, and personalized user experiences. The integration of AI into everyday applications is making technology more intuitive and responsive to human needs.</p>
+                </div>
+
+
+                
+                <h3>🎯 Learning Resources</h3>
+                <div class="link-list">
+                    <ul>
+                        <li><a href="https://freecodecamp.org" target="_blank">freeCodeCamp</a> - Free coding education</li>
+                        <li><a href="https://coursera.org" target="_blank">Coursera</a> - Online courses from universities</li>
+                        <li><a href="https://udemy.com" target="_blank">Udemy</a> - Practical skill-based learning</li>
+                        <li><a href="https://pluralsight.com" target="_blank">Pluralsight</a> - Technology skills platform</li>
+                        <button style="background-color: rgb(198, 236, 28); color: rgb(248, 67, 67); height: 60px; width: 200px; font-size: 1.2rem; border-radius: 20px;">Show your Interest in this field</button>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        
+        <p>Stay curious, keep learning, and remember that <span class="highlight">every expert was once a beginner</span>. The future of technology is being written today, and you can be part of that story.</p>
+    </div>
+
+    <script>
+        function showAlert() {
+            alert("🎉 Welcome to the Innovation Hub! 🚀\n\nYou've just experienced interactive web development in action. This demonstrates how JavaScript can create dynamic, engaging user experiences. Keep exploring and building amazing things!");
+        }
+
+        // Add some interactive hover effects
+        document.querySelectorAll('.tech-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.borderLeft = '5px solid #3498db';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.borderLeft = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
