@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic To-Do & Image Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('https://media.istockphoto.com/id/968990954/photo/smiling-college-student-with-book-and-pencil.jpg?s=612x612&w=0&k=20&c=idlDA1lForWqNLIotEFjwunbQti6L5BR4joGyjoWRRk=');
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            padding: 20px;
+            margin-top: 45px;
+            box-shadow: 5px 5px 10px 6px;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: transparent;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .header {
+            background: transparent;
+            padding: 30px;
+            text-align: center;
+            color: rgba(255, 104, 3, 0.986);
+            font-weight: bold;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .section {
+            padding: 40px;
+            position: relative;
+        }
+
+        .todo-section {
+            border-right: 1px solid #0e0d0dfa;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .todo-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .todo-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: slideIn 0.5s ease;
+        }
+
+        .todo-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .todo-text {
+            font-size: 1.1rem;
+            color: #333;
+            flex: 1;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #4facfe;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            border: 2px dashed #4facfe;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #4facfe;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .file-input-label:hover {
+            background: rgba(79, 172, 254, 0.1);
+            border-style: solid;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .image-item {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .image-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            border: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .image-remove:hover {
+            background: #ff6b6b;
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .todo-section {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .section {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="font-weight: bold;">Productivity Hub</h1>
+            <p>Organize your tasks and memories in one beautiful place</p>
+        </div>
+        
+        <div class="content">
+            <div class="section todo-section">
+                <h2 class="section-title">📝 Tasks</h2>
+                
+                <div class="input-group">
+                    <input type="text" id="todoInput" class="input-field" placeholder="What needs to be done?" maxlength="100">
+                    <button id="addTodoBtn" class="btn btn-primary">Add Task</button>
+                </div>
+                
+                <div id="todoList" class="todo-list">
+                    <div class="empty-state" style="background-color: chocolate;">No tasks yet. Add one above!</div>
+                </div>
+            </div>
+            
+            <div class="section gallery-section">
+                <h2 class="section-title">🖼️ Gallery</h2>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="imageInput" class="file-input" accept="image/*" multiple>
+                    <label for="imageInput" class="file-input-label">
+                        📁 Choose Images to Upload
+                    </label>
+                </div>
+                
+                <div id="gallery" class="gallery">
+                    <div class="empty-state" style="color: crimson;">No images yet. Upload some above!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class ProductivityApp {
+            constructor() {
+                this.todos = [];
+                this.images = [];
+                this.todoIdCounter = 1;
+                this.imageIdCounter = 1;
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.render();
+            }
+            
+            initializeElements() {
+                this.todoInput = document.getElementById('todoInput');
+                this.addTodoBtn = document.getElementById('addTodoBtn');
+                this.todoList = document.getElementById('todoList');
+                this.imageInput = document.getElementById('imageInput');
+                this.gallery = document.getElementById('gallery');
+            }
+            
+            bindEvents() {
+                this.addTodoBtn.addEventListener('click', () => this.addTodo());
+                this.todoInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addTodo();
+                });
+                this.imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
+            }
+            
+            addTodo() {
+                const text = this.todoInput.value.trim();
+                if (!text) return;
+                
+                const todo = {
+                    id: this.todoIdCounter++,
+                    text: text,
+                    completed: false,
+                    createdAt: new Date()
+                };
+                
+                this.todos.unshift(todo);
+                this.todoInput.value = '';
+                this.renderTodos();
+            }
+            
+            removeTodo(id) {
+                this.todos = this.todos.filter(todo => todo.id !== id);
+                this.renderTodos();
+            }
+            
+            toggleTodo(id) {
+                const todo = this.todos.find(todo => todo.id === id);
+                if (todo) {
+                    todo.completed = !todo.completed;
+                    this.renderTodos();
+                }
+            }
+            
+            handleImageUpload(event) {
+                const files = Array.from(event.target.files);
+                
+                files.forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const image = {
+                                id: this.imageIdCounter++,
+                                src: e.target.result,
+                                name: file.name,
+                                uploadedAt: new Date()
+                            };
+                            this.images.unshift(image);
+                            this.renderGallery();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                event.target.value = '';
+            }
+            
+            removeImage(id) {
+                this.images = this.images.filter(image => image.id !== id);
+                this.renderGallery();
+            }
+            
+            renderTodos() {
+                if (this.todos.length === 0) {
+                    this.todoList.innerHTML = '<div class="empty-state">No tasks yet. Add one above!</div>';
+                    return;
+                }
+                
+                const todosHtml = this.todos.map(todo => `
+                    <div class="todo-item ${todo.completed ? 'completed' : ''}">
+                        <input type="checkbox" class="checkbox" ${todo.completed ? 'checked' : ''} 
+                               onchange="app.toggleTodo(${todo.id})">
+                        <span class="todo-text">${this.escapeHtml(todo.text)}</span>
+                        <div class="todo-actions">
+                            <button class="btn btn-danger" onclick="app.removeTodo(${todo.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                this.todoList.innerHTML = todosHtml;
+            }
+            
+            renderGallery() {
+                if (this.images.length === 0) {
+                    this.gallery.innerHTML = '<div class="empty-state">No images yet. Upload some above!</div>';
+                    return;
+                }
+                
+                const imagesHtml = this.images.map(image => `
+                    <div class="image-item">
+                        <img src="${image.src}" alt="${this.escapeHtml(image.name)}" title="${this.escapeHtml(image.name)}">
+                        <button class="image-remove" onclick="app.removeImage(${image.id})" title="Remove image">×</button>
+                    </div>
+                `).join('');
+                
+                this.gallery.innerHTML = imagesHtml;
+            }
+            
+            render() {
+                this.renderTodos();
+                this.renderGallery();
+            }
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+        
+        // Initialize the app
+        const app = new ProductivityApp();
+        
+        // Add some sample data for demonstration
+        setTimeout(() => {
+            app.todos.push(
+                { id: app.todoIdCounter++, text: "Welcome to your productivity hub!", completed: false, createdAt: new Date() },
+                { id: app.todoIdCounter++, text: "Try adding a new task above", completed: false, createdAt: new Date() },
+                { id: app.todoIdCounter++, text: "Upload some images to the gallery", completed: true, createdAt: new Date() }
+            );
+            app.render();
+        }, 500);
+    </script>
+</body>
+</html>
