@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic API Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image:url('https://i.pinimg.com/736x/e1/ac/42/e1ac428985b5c8f6d704e68450f026ce.jpg');
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h2 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.8rem;
+        }
+
+        .weather-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .weather-item {
+            background: rgba(103, 126, 234, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .weather-item strong {
+            display: block;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .joke-content {
+            background: rgba(118, 75, 162, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            font-style: italic;
+            margin: 10px 0;
+            border-left: 4px solid #764ba2;
+        }
+
+        .fact-content {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #3498db;
+        }
+
+        .quote-content {
+            background: rgba(46, 204, 113, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #2ecc71;
+            font-style: italic;
+        }
+
+        .quote-author {
+            text-align: right;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #2ecc71;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .refresh-all {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .refresh-all .btn {
+            width: auto;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Dynamic API Dashboard</h1>
+        
+        <div class="dashboard">
+            <!-- Weather Card -->
+            <div class="card">
+                <h2><span class="icon">🌤️</span> Weather in London</h2>
+                <div id="weather-content">
+                    <div class="loading"></div> Loading weather data...
+                </div>
+                <button class="btn" onclick="fetchWeather()">🔄 Refresh Weather</button>
+                <div id="weather-status" class="status"></div>
+            </div>
+
+            <!-- Joke Card -->
+            <div class="card">
+                <h2><span class="icon">😂</span> Random Joke</h2>
+                <div id="joke-content">
+                    <div class="loading"></div> Loading a funny joke...
+                </div>
+                <button class="btn" onclick="fetchJoke()">🎭 New Joke</button>
+                <div id="joke-status" class="status"></div>
+            </div>
+
+            <!-- Fun Fact Card -->
+            <div class="card">
+                <h2><span class="icon">🧠</span> Random Fact</h2>
+                <div id="fact-content">
+                    <div class="loading"></div> Loading interesting fact...
+                </div>
+                <button class="btn" onclick="fetchFact()">🔍 New Fact</button>
+                <div id="fact-status" class="status"></div>
+            </div>
+
+            <!-- Quote Card -->
+            <div class="card">
+                <h2><span class="icon">💭</span> Inspirational Quote</h2>
+                <div id="quote-content">
+                    <div class="loading"></div> Loading wisdom...
+                </div>
+                <button class="btn" onclick="fetchQuote()">✨ New Quote</button>
+                <div id="quote-status" class="status"></div>
+            </div>
+        </div>
+
+        <div class="refresh-all">
+            <button class="btn" onclick="refreshAll()">🔄 Refresh All Data</button>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced weather function with better fallback
+        async function fetchWeather() {
+            const weatherContent = document.getElementById('weather-content');
+            const weatherStatus = document.getElementById('weather-status');
+            
+            weatherContent.innerHTML = '<div class="loading"></div> Loading weather data...';
+            weatherStatus.textContent = '';
+            
+            try {
+                // Try multiple weather APIs
+                let weatherData = null;
+                
+                // Try free weather API
+                try {
+                    const response = await fetch('https://wttr.in/London?format=j1');
+                    if (response.ok) {
+                        const data = await response.json();
+                        weatherData = {
+                            name: "London",
+                            main: {
+                                temp: parseInt(data.current_condition[0].temp_C),
+                                feels_like: parseInt(data.current_condition[0].FeelsLikeC),
+                                humidity: parseInt(data.current_condition[0].humidity),
+                                pressure: parseInt(data.current_condition[0].pressure)
+                            },
+                            weather: [{
+                                description: data.current_condition[0].weatherDesc[0].value.toLowerCase()
+                            }],
+                            wind: {
+                                speed: Math.round(parseInt(data.current_condition[0].windspeedKmph) / 3.6) // Convert km/h to m/s
+                            }
+                        };
+                        weatherStatus.textContent = 'Live data from wttr.in';
+                    }
+                } catch (e) {
+                    console.log('wttr.in failed, trying next...');
+                }
+
+                // If first API fails, try another approach
+                if (!weatherData) {
+                    try {
+                        const response = await fetch('https://api.openweathermap.org/data/2.5/weather?q=London&appid=demo&units=metric');
+                        if (response.ok) {
+                            weatherData = await response.json();
+                            weatherStatus.textContent = 'Live data from OpenWeatherMap';
+                        }
+                    } catch (e) {
+                        console.log('OpenWeatherMap demo failed');
+                    }
+                }
+
+                if (weatherData) {
+                    displayWeather(weatherData);
+                } else {
+                    throw new Error('All weather APIs unavailable');
+                }
+                
+            } catch (error) {
+                // Enhanced simulation with more realistic data
+                simulateWeather();
+                weatherStatus.textContent = 'Simulated data (APIs unavailable)';
+            }
+        }
+
+        function simulateWeather() {
+            const conditions = [
+                { main: "Clear", desc: "clear sky", temp: 18, wind: 3 },
+                { main: "Clouds", desc: "scattered clouds", temp: 15, wind: 5 },
+                { main: "Rain", desc: "light rain", temp: 12, wind: 7 },
+                { main: "Partly Cloudy", desc: "partly cloudy", temp: 16, wind: 4 },
+                { main: "Overcast", desc: "overcast clouds", temp: 14, wind: 6 }
+            ];
+            
+            const condition = conditions[Math.floor(Math.random() * conditions.length)];
+            const baseTemp = condition.temp + (Math.random() * 6 - 3); // ±3°C variation
+            
+            const mockWeather = {
+                name: "London",
+                main: {
+                    temp: Math.round(baseTemp),
+                    feels_like: Math.round(baseTemp + (Math.random() * 4 - 2)),
+                    humidity: Math.floor(Math.random() * 40) + 50,
+                    pressure: Math.floor(Math.random() * 30) + 1005
+                },
+                weather: [{
+                    main: condition.main,
+                    description: condition.desc
+                }],
+                wind: {
+                    speed: condition.wind + (Math.random() * 2 - 1)
+                }
+            };
+            displayWeather(mockWeather);
+        }
+
+        function displayWeather(data) {
+            const weatherContent = document.getElementById('weather-content');
+            weatherContent.innerHTML = `
+                <div class="weather-info">
+                    <div class="weather-item">
+                        <strong>Temperature</strong>
+                        ${Math.round(data.main.temp)}°C
+                    </div>
+                    <div class="weather-item">
+                        <strong>Feels Like</strong>
+                        ${Math.round(data.main.feels_like)}°C
+                    </div>
+                    <div class="weather-item">
+                        <strong>Humidity</strong>
+                        ${data.main.humidity}%
+                    </div>
+                    <div class="weather-item">
+                        <strong>Wind Speed</strong>
+                        ${Math.round(data.wind.speed)} m/s
+                    </div>
+                </div>
+                <p style="margin-top: 10px; text-align: center; color: #666;">
+                    ${data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1)} in ${data.name}
+                </p>
+            `;
+        }
+
+        // Enhanced joke function
+        async function fetchJoke() {
+            const jokeContent = document.getElementById('joke-content');
+            const jokeStatus = document.getElementById('joke-status');
+            
+            jokeContent.innerHTML = '<div class="loading"></div> Loading a funny joke...';
+            jokeStatus.textContent = '';
+            
+            try {
+                // Try multiple joke APIs
+                let response = await fetch('https://official-joke-api.appspot.com/random_joke');
+                
+                if (!response.ok) {
+                    // Try alternative joke API
+                    response = await fetch('https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,political,racist,sexist,explicit&type=twopart');
+                }
+                
+                const data = await response.json();
+                
+                if (data.setup && data.punchline) {
+                    // Two-part joke format
+                    jokeContent.innerHTML = `
+                        <div class="joke-content">
+                            <strong>Q:</strong> ${data.setup}<br><br>
+                            <strong>A:</strong> ${data.punchline}
+                        </div>
+                    `;
+                } else if (data.joke) {
+                    // Single joke format
+                    jokeContent.innerHTML = `
+                        <div class="joke-content">
+                            ${data.joke}
+                        </div>
+                    `;
+                }
+                
+                jokeStatus.textContent = 'Fresh joke loaded!';
+                
+            } catch (error) {
+                const backupJokes = [
+                    { setup: "Why don't scientists trust atoms?", punchline: "Because they make up everything!" },
+                    { setup: "What do you call a fake noodle?", punchline: "An impasta!" },
+                    { setup: "Why did the scarecrow win an award?", punchline: "He was outstanding in his field!" },
+                    { setup: "What's the best thing about Switzerland?", punchline: "I don't know, but the flag is a big plus!" },
+                    { setup: "Why don't eggs tell jokes?", punchline: "They'd crack each other up!" }
+                ];
+                
+                const randomJoke = backupJokes[Math.floor(Math.random() * backupJokes.length)];
+                
+                jokeContent.innerHTML = `
+                    <div class="joke-content">
+                        <strong>Q:</strong> ${randomJoke.setup}<br><br>
+                        <strong>A:</strong> ${randomJoke.punchline}
+                    </div>
+                `;
+                jokeStatus.textContent = 'Backup joke (API unavailable)';
+            }
+        }
+
+        // Enhanced fact function
+        async function fetchFact() {
+            const factContent = document.getElementById('fact-content');
+            const factStatus = document.getElementById('fact-status');
+            
+            factContent.innerHTML = '<div class="loading"></div> Loading interesting fact...';
+            factStatus.textContent = '';
+            
+            try {
+                // Try multiple fact APIs
+                let response;
+                let data;
+                
+                try {
+                    response = await fetch('https://uselessfacts.jsph.pl/random.json?language=en');
+                    data = await response.json();
+                    if (data.text) {
+                        factContent.innerHTML = `<div class="fact-content">${data.text}</div>`;
+                        factStatus.textContent = 'Random fact loaded!';
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Useless facts API failed');
+                }
+                
+                try {
+                    response = await fetch('https://catfact.ninja/fact');
+                    data = await response.json();
+                    if (data.fact) {
+                        factContent.innerHTML = `<div class="fact-content">🐱 ${data.fact}</div>`;
+                        factStatus.textContent = 'Cat fact loaded!';
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Cat facts API failed');
+                }
+                
+                throw new Error('All fact APIs failed');
+                
+            } catch (error) {
+                const backupFacts = [
+                    "The human brain contains approximately 86 billion neurons! 🧠",
+                    "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old! 🍯",
+                    "A group of flamingos is called a 'flamboyance'! 🦩",
+                    "Octopuses have three hearts and blue blood! 🐙",
+                    "The shortest war in history lasted only 38-45 minutes between Britain and Zanzibar in 1896! ⚔️",
+                    "Bananas are berries, but strawberries aren't! 🍌🍓",
+                    "A single cloud can weigh more than a million pounds! ☁️"
+                ];
+                
+                const randomFact = backupFacts[Math.floor(Math.random() * backupFacts.length)];
+                factContent.innerHTML = `<div class="fact-content">${randomFact}</div>`;
+                factStatus.textContent = 'Backup fact (APIs unavailable)';
+            }
+        }
+
+        // Enhanced quote function with better fallback
+        async function fetchQuote() {
+            const quoteContent = document.getElementById('quote-content');
+            const quoteStatus = document.getElementById('quote-status');
+            
+            quoteContent.innerHTML = '<div class="loading"></div> Loading wisdom...';
+            quoteStatus.textContent = '';
+            
+            try {
+                // Try multiple quote APIs
+                let response;
+                let data;
+                
+                // First try quotable.io
+                try {
+                    response = await fetch('https://api.quotable.io/random?minLength=50&maxLength=200');
+                    if (response.ok) {
+                        data = await response.json();
+                        if (data.content && data.author) {
+                            quoteContent.innerHTML = `
+                                <div class="quote-content">
+                                    "${data.content}"
+                                    <div class="quote-author">— ${data.author}</div>
+                                </div>
+                            `;
+                            quoteStatus.textContent = 'Inspirational quote loaded!';
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Quotable API failed');
+                }
+                
+                // Try alternative quote API
+                try {
+                    response = await fetch('https://api.quotable.io/random');
+                    if (response.ok) {
+                        data = await response.json();
+                        if (data[0] && data[0].q && data[0].a) {
+                            quoteContent.innerHTML = `
+                                <div class="quote-content">
+                                    "${data[0].q}"
+                                    <div class="quote-author">— ${data[0].a}</div>
+                                </div>
+                            `;
+                            quoteStatus.textContent = 'Wisdom loaded!';
+                            return;
+                        }
+                    }
+                } catch (e) {
+                    console.log('ZenQuotes API failed');
+                }
+                
+                throw new Error('All quote APIs failed');
+                
+            } catch (error) {
+                // Enhanced backup quotes collection
+                const backupQuotes = [
+                    { content: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+                    { content: "Innovation distinguishes between a leader and a follower.", author: "Steve Jobs" },
+                    { content: "Life is what happens to you while you're busy making other plans.", author: "John Lennon" },
+                    { content: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+                    { content: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" },
+                    { content: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+                    { content: "The only impossible journey is the one you never begin.", author: "Tony Robbins" },
+                    { content: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+                    { content: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+                    { content: "The best time to plant a tree was 20 years ago. The second best time is now.", author: "Chinese Proverb" }
+                ];
+                
+                const randomQuote = backupQuotes[Math.floor(Math.random() * backupQuotes.length)];
+                
+                quoteContent.innerHTML = `
+                    <div class="quote-content">
+                        "${randomQuote.content}"
+                        <div class="quote-author">— ${randomQuote.author}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Refresh all data
+        function refreshAll() {
+            fetchWeather();
+            fetchJoke();
+            fetchFact();
+            fetchQuote();
+        }
+
+        // Initialize all data when page loads
+        window.addEventListener('load', function() {
+            // Add a small delay to make the loading animation visible
+            setTimeout(refreshAll, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Knowledge Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-image: url('https://cdndailyexcelsior.b-cdn.net/wp-content/uploads/2023/06/QUIZ.jpg');
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .quiz-container {
+            background: white;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 600px;
+            opacity: 0.9;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ecdc4, #45b7d1);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            width: 0%;
+        }
+
+        .question-counter {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .question {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 600;
+            line-height: 1.4;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #4ecdc4;
+        }
+
+        .option:hover::before {
+            left: 100%;
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+            color: white;
+            border-color: #4ecdc4;
+            transform: scale(1.02);
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+            border-color: #27ae60;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border-color: #c0392b;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .score-display {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .results {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .final-score {
+            font-size: 3em;
+            font-weight: 700;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-message {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .emoji {
+            font-size: 2em;
+            margin: 0 10px;
+            animation: bounce 0.5s ease infinite alternate;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .question {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>🧠 QuizIt</h1>
+        
+        <div id="quiz-content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            
+            <div class="question-counter" id="question-counter">
+                Question 1 of 8
+            </div>
+            
+            <div class="question" id="question">
+                Loading question...
+            </div>
+            
+            <div class="options" id="options">
+                <!-- Options will be dynamically generated -->
+            </div>
+            
+            <div class="score-display" id="score-display">
+                Score: 0 / 8
+            </div>
+            
+            <button class="btn" id="next-btn" onclick="nextQuestion()" disabled>
+                Next Question
+            </button>
+        </div>
+        
+        <div id="results" class="results hidden">
+            <div class="emoji">🎉</div>
+            <div class="final-score" id="final-score">0/8</div>
+            <div class="score-message" id="score-message">Great job!</div>
+            <button class="btn" onclick="restartQuiz()">Try Again</button>
+            <button class="btn" onclick="showAnswers()">Review Answers</button>
+        </div>
+        
+        <div id="review" class="hidden">
+            <h2>Answer Review</h2>
+            <div id="review-content"></div>
+            <button class="btn" onclick="restartQuiz()">Start New Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the largest planet in our solar system?",
+                options: ["Earth", "Jupiter", "Saturn", "Neptune"],
+                correct: 1,
+                explanation: "Jupiter is the largest planet, with a mass more than twice that of all other planets combined."
+            },
+            {
+                question: "Which programming language is known as the 'language of the web'?",
+                options: ["Python", "Java", "JavaScript", "C++"],
+                correct: 2,
+                explanation: "JavaScript is essential for web development and runs in every web browser."
+            },
+            {
+                question: "What is the chemical symbol for gold?",
+                options: ["Go", "Gd", "Au", "Ag"],
+                correct: 2,
+                explanation: "Au comes from the Latin word 'aurum', meaning gold."
+            },
+            {
+                question: "Which country has the most time zones?",
+                options: ["Russia", "United States", "China", "France"],
+                correct: 3,
+                explanation: "France has 12 time zones due to its overseas territories, more than any other country."
+            },
+            {
+                question: "What is the smallest unit of matter?",
+                options: ["Molecule", "Atom", "Electron", "Proton"],
+                correct: 1,
+                explanation: "An atom is the smallest unit of ordinary matter that forms a chemical element."
+            },
+            {
+                question: "Which ocean is the largest?",
+                options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                correct: 3,
+                explanation: "The Pacific Ocean covers about 46% of the Earth's water surface."
+            },
+            {
+                question: "What does 'HTML' stand for?",
+                options: ["Hyper Text Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink and Text Markup Language"],
+                correct: 0,
+                explanation: "HTML stands for Hyper Text Markup Language, the standard markup language for web pages."
+            },
+            {
+                question: "Which planet is known as the 'Red Planet'?",
+                options: ["Venus", "Mars", "Mercury", "Jupiter"],
+                correct: 1,
+                explanation: "Mars appears red due to iron oxide (rust) on its surface."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let userAnswers = [];
+
+        function initQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            userAnswers = [];
+            document.getElementById('quiz-content').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('review').classList.add('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const question = quizData[currentQuestion];
+            const progressPercent = ((currentQuestion + 1) / quizData.length) * 100;
+            
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+            document.getElementById('question-counter').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+            document.getElementById('question').textContent = question.question;
+            document.getElementById('score-display').textContent = `Score: ${score} / ${quizData.length}`;
+            
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            document.getElementById('next-btn').disabled = true;
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(answerIndex) {
+            if (selectedAnswer !== null) return; // Prevent multiple selections
+            
+            selectedAnswer = answerIndex;
+            const options = document.querySelectorAll('.option');
+            const correctAnswer = quizData[currentQuestion].correct;
+            
+            options.forEach((option, index) => {
+                if (index === answerIndex) {
+                    option.classList.add('selected');
+                }
+            });
+            
+            // Show correct/incorrect after a brief delay
+            setTimeout(() => {
+                options.forEach((option, index) => {
+                    if (index === correctAnswer) {
+                        option.classList.add('correct');
+                    } else if (index === answerIndex && index !== correctAnswer) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                if (answerIndex === correctAnswer) {
+                    score++;
+                    document.getElementById('score-display').textContent = `Score: ${score} / ${quizData.length}`;
+                }
+                
+                userAnswers.push({
+                    question: quizData[currentQuestion].question,
+                    selected: quizData[currentQuestion].options[answerIndex],
+                    correct: quizData[currentQuestion].options[correctAnswer],
+                    isCorrect: answerIndex === correctAnswer,
+                    explanation: quizData[currentQuestion].explanation
+                });
+                
+                document.getElementById('next-btn').disabled = false;
+            }, 500);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < quizData.length) {
+                setTimeout(() => {
+                    loadQuestion();
+                }, 300);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-content').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('final-score').textContent = `${score}/${quizData.length}`;
+            
+            let message = '';
+            let emoji = '🎉';
+            
+            if (percentage >= 90) {
+                message = 'Outstanding! You\'re a quiz master!';
+                emoji = '🏆';
+            } else if (percentage >= 80) {
+                message = 'Excellent work! You really know your stuff!';
+                emoji = '🌟';
+            } else if (percentage >= 70) {
+                message = 'Great job! You did really well!';
+                emoji = '👏';
+            } else if (percentage >= 60) {
+                message = 'Good effort! Keep learning!';
+                emoji = '👍';
+            } else {
+                message = 'Nice try! Practice makes perfect!';
+                emoji = '💪';
+            }
+            
+            document.querySelector('.emoji').textContent = emoji;
+            document.getElementById('score-message').textContent = message;
+        }
+
+        function showAnswers() {
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('review').classList.remove('hidden');
+            
+            const reviewContent = document.getElementById('review-content');
+            reviewContent.innerHTML = '';
+            
+            userAnswers.forEach((answer, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.style.cssText = `
+                    margin: 20px 0;
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: left;
+                    background: ${answer.isCorrect ? '#d4edda' : '#f8d7da'};
+                    border: 1px solid ${answer.isCorrect ? '#c3e6cb' : '#f5c6cb'};
+                `;
+                
+                reviewItem.innerHTML = `
+                    <h3 style="color: #333; margin-bottom: 10px;">Question ${index + 1}</h3>
+                    <p style="font-weight: bold; margin-bottom: 10px;">${answer.question}</p>
+                    <p style="margin: 5px 0;"><strong>Your answer:</strong> ${answer.selected} ${answer.isCorrect ? '✅' : '❌'}</p>
+                    ${!answer.isCorrect ? `<p style="margin: 5px 0;"><strong>Correct answer:</strong> ${answer.correct}</p>` : ''}
+                    <p style="margin: 10px 0 0 0; font-style: italic; color: #666;">${answer.explanation}</p>
+                `;
+                
+                reviewContent.appendChild(reviewItem);
+            });
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        // Initialize the quiz when the page loads
+        window.onload = initQuiz;
+    </script>
+</body>
+</html>
